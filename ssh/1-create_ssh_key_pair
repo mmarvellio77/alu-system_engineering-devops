@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Creates a new 4096-bit RSA key pair named "school" in the current directory,
+# protected by the passphrase "betty".
+# "school" holds the private key and "school.pub" holds the public key.
+# Any previous key pair is removed first so the script can be run again
+# without ssh-keygen stopping on an overwrite prompt.
+rm -f school school.pub
+ssh-keygen -t rsa -b 4096 -N betty -f school
