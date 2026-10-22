@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Connects to my server using the private key ~/.ssh/school as the user ubuntu.
 # The user is passed with the "user@host" syntax because -l is not allowed,
 # and -i is the only option used to select the identity file.
