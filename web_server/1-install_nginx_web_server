@@ -1,27 +1,7 @@
 #!/usr/bin/env bash
-# Installs and configures nginx on Ubuntu
-# Nginx listens on port 80 and returns "Holberton School" at root /
-
-# Update package lists and install nginx
-apt-get update
+# Installs nginx and serves "Holberton School" on port 80
+apt-get update -y
 apt-get install -y nginx
-
-# Create the custom index page with "Holberton School"
-echo "Holberton School for the win!" > /var/www/html/index.html
-
-# Start nginx (without using systemctl)
-# Since systemctl may not be available, use service or direct process management
-service nginx start 2>/dev/null || nginx
-
-# If nginx is already running, reload the configuration
-if pgrep -x "nginx" > /dev/null; then
-    # Graceful reload
-    nginx -s reload
-fi
-
-# Verify the installation
-echo "Nginx installed and configured"
-echo "Verifying root / endpoint..."
-RESULT=$(curl -s localhost)
-echo "$RESULT"
-echo "$RESULT" | grep -i "holberton" && echo "Success: Holberton School string found"
+echo "Holberton School" > /var/www/html/index.html
+echo "Holberton School" > /var/www/html/index.nginx-debian.html
+service nginx restart
