@@ -1,58 +1,27 @@
 #!/usr/bin/env bash
-# Installs and configures HAproxy to load balance HTTP traffic between
-# web-01 and web-02 using the roundrobin algorithm.
-
-echo "Configuring HAproxy roundrobin load balancer for web-01 and web-02"
-
+# Installs HAProxy and sends traffic to web-01 and web-02 with roundrobin
 apt-get update -y
 apt-get install -y haproxy
-
-cat <<'EOF' | tee /etc/haproxy/haproxy.cfg
-global
-    log /dev/log local0
-    log /dev/log local1 notice
-    chroot /var/lib/haproxy
-    stats socket /run/haproxy/admin.sock mode 660 level admin expose-fd listeners
-    stats timeout 30s
-    user haproxy
-    group haproxy
-    daemon
-
-defaults
-    log global
-    mode http
-    option httplog
-    option dontlognull
-    timeout connect 5000
-    timeout client  50000
-    timeout server  50000
-    errorfile 400 /etc/haproxy/errors/400.http
-    errorfile 403 /etc/haproxy/errors/403.http
-    errorfile 408 /etc/haproxy/errors/408.http
-    errorfile 500 /etc/haproxy/errors/500.http
-    errorfile 502 /etc/haproxy/errors/502.http
-    errorfile 503 /etc/haproxy/errors/503.http
-    errorfile 504 /etc/haproxy/errors/504.http
+if grep -q '^ENABLED=' /etc/default/haproxy
+then
+	sed -i 's/^ENABLED=.*/ENABLED=1/' /etc/default/haproxy
+else
+	echo 'ENABLED=1' >> /etc/default/haproxy
+fi
+if ! grep -q "backend web_servers" /etc/haproxy/haproxy.cfg
+then
+	cat >> /etc/haproxy/haproxy.cfg << 'EOF'
 
 frontend http_front
-    bind *:80
-    default_backend web_servers
+	bind *:80
+	mode http
+	default_backend web_servers
 
 backend web_servers
-    balance roundrobin
-    server web-01 16.60.28.179:80 check
-    server web-02 18.171.175.36:80 check
+	mode http
+	balance roundrobin
+	server 7355-web-01 18.171.170.245:80 check
+	server 7355-web-02 18.171.175.36:80 check
 EOF
-
-echo "Configuring HAproxy roundrobin backend with web-01 and web-02"
-echo "  web-01: 16.60.28.179:80"
-echo "  web-02: 18.171.175.36:80"
-
-# Validate the configuration before (re)starting the service.
-haproxy -c -f /etc/haproxy/haproxy.cfg
-
-# Manage HAproxy via the init script and start it on boot.
-systemctl enable haproxy
+fi
 service haproxy restart
-
-echo "HAproxy is load balancing web-01 and web-02 with roundrobin"
