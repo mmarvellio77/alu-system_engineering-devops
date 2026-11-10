@@ -2,6 +2,8 @@
 # Installs and configures HAproxy to load balance HTTP traffic between
 # web-01 and web-02 using the roundrobin algorithm.
 
+echo "Configuring HAproxy roundrobin load balancer for web-01 and web-02"
+
 apt-get update -y
 apt-get install -y haproxy
 
