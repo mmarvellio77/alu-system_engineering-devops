@@ -7,7 +7,7 @@ echo "Configuring HAproxy roundrobin load balancer for web-01 and web-02"
 apt-get update -y
 apt-get install -y haproxy
 
-cat > /etc/haproxy/haproxy.cfg <<'EOF'
+cat <<'EOF' | tee /etc/haproxy/haproxy.cfg
 global
     log /dev/log local0
     log /dev/log local1 notice
@@ -54,3 +54,5 @@ haproxy -c -f /etc/haproxy/haproxy.cfg
 # Manage HAproxy via the init script and start it on boot.
 systemctl enable haproxy
 service haproxy restart
+
+echo "HAproxy is load balancing web-01 and web-02 with roundrobin"
