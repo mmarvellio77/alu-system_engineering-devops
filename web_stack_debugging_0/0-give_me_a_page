@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Starts Apache so the container serves a page on port 80
+service apache2 start
